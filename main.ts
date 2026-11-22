@@ -15,6 +15,16 @@ import { buildDossier } from './vendor/makefun-game.ts';
 const repoDir = fileURLToPath(new URL('.', import.meta.url));
 const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
+// Fail fast, before copying anything, when an expected screenshot is
+// missing: a hand-in without its evidence images would score on an
+// incomplete dossier, so name the absent file here instead.
+const expectedScreenshots = ['1-start.jpg', '2-play.jpg', '3-end.jpg'];
+for (const shot of expectedScreenshots) {
+  if (!existsSync(join(repoDir, 'screenshots', shot))) {
+    throw new Error(`missing expected screenshot: screenshots/${shot}`);
+  }
+}
+
 mkdirSync(outputDir, { recursive: true });
 cpSync(join(repoDir, 'game'), join(outputDir, 'game'), { recursive: true });
 mkdirSync(join(outputDir, 'screenshots'), { recursive: true });
